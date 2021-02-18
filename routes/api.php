@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RestauranteController;
+use App\Http\Controllers\AgregadoController;
+use App\Http\Controllers\AtencionController;
+use App\Http\Controllers\MesaController;
+use App\Http\Controllers\TarjetaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +37,7 @@ Route::group([
 
 Route::resource('menus', MenuController::class);
 Route::resource('restaurantes', RestauranteController::class);
-Route::resource('agregados', RestauranteController::class);
-Route::resource('atenciones', RestauranteController::class);
-Route::resource('mesas', RestauranteController::class);
-Route::resource('tarjetas', RestauranteController::class);
+Route::resource('agregados', AgregadoController::class);
+Route::resource('atenciones', AtencionController::class);
+Route::resource('mesas', MesaController::class);
+Route::resource('tarjetas', TarjetaController::class);
