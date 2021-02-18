@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tarjeta;
+use App\Models\Agregado;
 
 use Validator;
 
-class TarjetaController extends Controller
+class AgregadoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,11 +16,11 @@ class TarjetaController extends Controller
      */
     public function index()
     {
-        $tarjetas =  Tarjeta::all();
+        $agregados =  Agregado::all();
         return response()->json([
             'success' => true,
             'message' => "done",
-            'data' => ['tarjetas'=>$tarjetas]
+            'data' => ['agregados'=>$agregados]
         ], 200);
     }
 
@@ -42,11 +42,13 @@ class TarjetaController extends Controller
      */
     public function store(Request $request)
     {
-        $entradas = $request->only('numeroTarjeta', 'fecha', 'cvc');
+        $entradas = $request->only('nombre', 'descripcion', 'precio', 'disponible', 'edad18');
         $validator = Validator::make($entradas, [
-            'numeroTarjeta' => ['required', 'string'],
-            'fecha' => [' required', 'string'],
-            'cvc' => ['required', 'string']
+            'nombre' => ['required', 'string'],
+            'descripcion' => [' required', 'string'],
+            'precio' => ['required', 'string'],
+            'disponible' => [' required', 'string'],
+            'edad18' => ['required', 'string']
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -57,15 +59,17 @@ class TarjetaController extends Controller
         }
         $entradas = $this->rellenarDatosFaltantes(null, $entradas);
         try{
-            $tarjeta = new Tarjeta();
-            $tarjeta->numeroTarjeta=$entradas['numeroTarjeta'];
-            $tarjeta->fecha=$entradas['fecha'];
-            $tarjeta->cvc=$entradas['cvc'];
-            $tarjeta->save();
+            $agregado = new Agregado();
+            $agregado->nombre=$entradas['nombre'];
+            $agregado->descripcion=$entradas['descripcion'];
+            $agregado->precio=$entradas['precio'];
+            $agregado->disponible=$entradas['disponible'];
+            $agregado->edad18=$entradas['edad18'];
+            $agregado->save();
             return response()->json([
                 'success' => true,
                 'message' => "done",
-                'data' => ['tarjeta'=>$tarjeta]
+                'data' => ['agregado'=>$agregado]
             ], 200);
         //----- Mecanismos anticaidas y reporte de errores -----
         }catch(\Illuminate\Database\QueryException $ex){ 
@@ -108,11 +112,13 @@ class TarjetaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $entradas = $request->only('numeroTarjeta', 'fecha', 'cvc');
+        $entradas = $request->only('nombre', 'descripcion', 'precio', 'disponible', 'edad18');
         $validator = Validator::make($entradas, [
-            'numeroTarjeta' => ['required', 'string'],
-            'fecha' => [' required', 'string'],
-            'cvc' => ['required', 'string']
+            'nombre' => ['required', 'string'],
+            'descripcion' => [' required', 'string'],
+            'precio' => ['required', 'string'],
+            'disponible' => [' required', 'string'],
+            'edad18' => ['required', 'string']
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -122,23 +128,24 @@ class TarjetaController extends Controller
             ], 422);
         }
         try{
-            $tarjeta = Tarjeta::find($id);
-            if($tarjeta==null){
+            $agregado = Agregado::find($id);
+            if($agregado==null){
                 return response()->json([
                     'success' => false,
-                    'message' => 'El tarjeta con el id '.$id.' no existe',
+                    'message' => 'El agregado con el id '.$id.' no existe',
                     'data' => null
                 ], 409 );
             }
-            $entradas = $this->rellenarDatosFaltantes($tarjeta, $entradas);
-            $tarjeta->numeroTarjeta=$entradas['numeroTarjeta'];
-            $tarjeta->fecha=$entradas['fecha'];
-            $tarjeta->cvc=$entradas['cvc'];
-            $tarjeta->save();
+            $agregado->nombre=$entradas['nombre'];
+            $agregado->descripcion=$entradas['descripcion'];
+            $agregado->precio=$entradas['precio'];
+            $agregado->disponible=$entradas['disponible'];
+            $agregado->edad18=$entradas['edad18'];
+            $agregado->save();
             return response()->json([
                 'success' => true,
                 'message' => "done",
-                'data' => ['tarjeta'=>$tarjeta]
+                'data' => ['agregado'=>$agregado]
             ], 200);
         //----- Mecanismos anticaidas y reporte de errores -----
         }catch(\Illuminate\Database\QueryException $ex){ 
@@ -159,19 +166,19 @@ class TarjetaController extends Controller
     public function destroy($id)
     {
         try{
-            $tarjeta = Tarjeta::find($id);
-            if($tarjeta==null){
+            $agregado = Agregado::find($id);
+            if($agregado==null){
                 return response()->json([
                     'success' => false,
-                    'message' => 'El tarjeta con el id '.$id.' no existe',
+                    'message' => 'El agregado con el id '.$id.' no existe',
                     'data' => null
                 ], 409 );
             }
-            $tarjeta->delete();
+            $agregado->delete();
             return response()->json([
                 'success' => true,
                 'message' => "done",
-                'data' => ['tarjeta'=>$tarjeta]
+                'data' => ['agregado'=>$agregado]
             ], 200);
         //----- Mecanismos anticaidas y reporte de errores -----
         }catch(\Illuminate\Database\QueryException $ex){ 
@@ -189,24 +196,36 @@ class TarjetaController extends Controller
      */
     private function rellenarDatosFaltantes($array, $entradas){
         if($array==null){
-            if(!array_key_exists ("numeroTarjeta" , $entradas)){
-                $entradas['numeroTarjeta'] = null;
+            if(!array_key_exists ("nombre" , $entradas)){
+                $entradas['nombre'] = null;
             }
-            if(!array_key_exists ("fecha" , $entradas)){
-                $entradas['fecha'] = null;
+            if(!array_key_exists ("descripcion" , $entradas)){
+                $entradas['descripcion'] = null;
             }
-            if(!array_key_exists ("cvc" , $entradas)){
-                $entradas['cvc'] = null;
+            if(!array_key_exists ("precio" , $entradas)){
+                $entradas['precio'] = null;
+            }
+            if(!array_key_exists ("disponible" , $entradas)){
+                $entradas['disponible'] = null;
+            }
+            if(!array_key_exists ("edad18" , $entradas)){
+                $entradas['edad18'] = null;
             }
         }else{
-            if(!array_key_exists ("numeroTarjeta" , $entradas)){
-                $entradas['numeroTarjeta'] = $array['numeroTarjeta'];
+            if(!array_key_exists ("nombre" , $entradas)){
+                $entradas['nombre'] = $array['nombre'];
             }
-            if(!array_key_exists ("fecha" , $entradas)){
-                $entradas['fecha'] = $array['fecha'];
+            if(!array_key_exists ("descripcion" , $entradas)){
+                $entradas['descripcion'] = $array['descripcion'];
             }
-            if(!array_key_exists ("cvc" , $entradas)){
-                $entradas['cvc'] = $array['cvc'];
+            if(!array_key_exists ("precio" , $entradas)){
+                $entradas['precio'] = $array['precio'];
+            }
+            if(!array_key_exists ("disponible" , $entradas)){
+                $entradas['disponible'] = $array['disponible'];
+            }
+            if(!array_key_exists ("edad18" , $entradas)){
+                $entradas['edad18'] = $array['edad18'];
             }
         }
         return $entradas;

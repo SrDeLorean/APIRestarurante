@@ -33,3 +33,7 @@ Route::group([
 
 Route::resource('menus', MenuController::class);
 Route::resource('restaurantes', RestauranteController::class);
+Route::resource('agregados', RestauranteController::class);
+Route::resource('atenciones', RestauranteController::class);
+Route::resource('mesas', RestauranteController::class);
+Route::resource('tarjetas', RestauranteController::class);
